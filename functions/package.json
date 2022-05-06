@@ -10,18 +10,16 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "12"
+    "node": "16"
   },
   "dependencies": {
-    "chrome-aws-lambda": "^7.0.0",
-    "firebase-admin": "^9.5.0",
-    "firebase-functions": "^3.13.1",
-    "puppeteer-core": "^7.1.0"
+    "firebase-admin": "^10.1.0",
+    "firebase-functions": "^3.20.1",
+    "puppeteer": "13.5.2"
   },
   "devDependencies": {
-    "eslint": "^7.20.0",
-    "firebase-functions-test": "^0.2.3",
-    "puppeteer": "^7.1.0"
+    "eslint": "^8.14.0",
+    "firebase-functions-test": "^0.3.3"
   },
   "private": true
 }
