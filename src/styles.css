@@ -1,0 +1,1810 @@
+:root {
+  --bg: #0d121b;
+  --bg-elev-1: #111926;
+  --bg-elev-2: #141f2f;
+  --bg-elev-3: #1a2638;
+  --border: #28364a;
+  --text: #d7dfec;
+  --text-muted: #8ca0bf;
+  --accent: #84d11f;
+  --accent-2: #5e9416;
+  --danger: #f57a7a;
+}
+
+[data-theme="light"] {
+  --bg: #f4f6fa;
+  --bg-elev-1: #ffffff;
+  --bg-elev-2: #f9fbff;
+  --bg-elev-3: #f1f5fc;
+  --border: #ccd7e8;
+  --text: #1b2432;
+  --text-muted: #50627e;
+  --accent: #5e9416;
+  --accent-2: #4e7d12;
+  --danger: #b73030;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Ropa Sans", "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.appRoot {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.topBand {
+  height: 4px;
+  background: linear-gradient(90deg, #84d11f 0%, #f3ac3c 40%, #4f9fbe 100%);
+}
+
+.appHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #0a0f16;
+}
+
+[data-theme="light"] .appHeader {
+  background: var(--bg-elev-1);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.brandLogo {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  display: block;
+}
+
+.brandVersion {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.headerTools {
+  flex: 1;
+  min-width: 0;
+}
+
+.headerTools ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.headerTools a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.24rem 0.58rem;
+  font-size: 0.86rem;
+  background: var(--bg-elev-2);
+}
+
+.headerTools a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.toolIcon {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+}
+
+.toolIconImage {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  display: block;
+}
+
+.themeSwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.themeSwitch > select,
+.targetInlineInput,
+.targetInlineSelect,
+.controlField > input,
+.controlField > select {
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font: inherit;
+  padding: 0 8px;
+}
+
+.themeSwitch > select:focus-visible,
+.targetInlineInput:focus-visible,
+.targetInlineSelect:focus-visible,
+.controlField > input:focus-visible,
+.controlField > select:focus-visible,
+.modeButton:focus-visible,
+.secondaryButton:focus-visible,
+.actionButton:focus-visible,
+.colorItem:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.content {
+  width: min(1700px, 100%);
+  margin: 0 auto;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--bg-elev-1);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.panelHeaderMain {
+  display: grid;
+  gap: 2px;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.panelHeader span,
+.targetsMeta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.toolbarPanel {
+  padding: 6px;
+}
+
+.targetRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.modeSwitch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.modeButton {
+  border: 0;
+  background: var(--bg-elev-2);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  padding: 0.42rem 0.68rem;
+}
+
+.modeButton + .modeButton {
+  border-left: 1px solid var(--border);
+}
+
+.modeButton.active {
+  color: #061004;
+  background: var(--accent);
+}
+
+.targetInlineInput {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.targetInlineSelect {
+  flex-shrink: 0;
+}
+
+
+.backendInline {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.backendInline .targetInlineSelect {
+  min-width: 0;
+}
+.statusCard {
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  padding: 8px;
+  color: var(--text-muted);
+}
+
+.errorCard {
+  border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+  color: var(--danger);
+}
+
+.workspaceGrid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+.editorPanel {
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  background: #070b13;
+}
+
+.editorWrap {
+  flex: 1;
+  min-height: clamp(360px, 72vh, 900px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #070b13;
+}
+
+.editorWrap .cm-editor {
+  height: 100%;
+  background: #070b13;
+  color: #d8e2f2;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 15px;
+}
+
+.editorWrap .cm-scroller {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.editorWrap .cm-gutters {
+  background: #0d131d;
+  border-right: 1px solid #182234;
+  color: #5f7392;
+}
+.editorWrap .cm-cursor,
+.editorWrap .cm-dropCursor {
+  border-left: 2px solid #e8f0ff !important;
+}
+
+.editorWrap .cm-fat-cursor {
+  background: rgba(232, 240, 255, 0.78) !important;
+}
+
+.editorWrap .cm-content {
+  caret-color: #f1f7ff;
+}
+
+.previewColumn {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.previewPanel {
+  display: grid;
+  gap: 8px;
+}
+.previewCompareControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.toggleCheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggleCheck input {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: #b65bff;
+  cursor: pointer;
+}
+
+.toggleCheck span {
+  white-space: nowrap;
+}
+
+.previewPair {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.previewBlock {
+  display: grid;
+  gap: 4px;
+}
+
+.previewBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.previewBlockTitle {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.previewCanvas,
+.referenceWrap {
+  width: 400px;
+  height: 300px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+}
+
+.previewLoader {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 4;
+  background: conic-gradient(#ffffff, #6b7895);
+  animation: spin 500ms linear infinite;
+}
+
+.previewGenerated,
+.previewTargetOverlay,
+.previewTarget {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.previewTargetOverlay {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.previewTargetOverlayVertical {
+  border-left: 1px solid #ff3b4e;
+}
+
+.previewTargetOverlayHorizontal {
+  border-top: 1px solid #ff3b4e;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.buttonRow.compact {
+  gap: 4px;
+}
+
+.secondaryButton,
+.actionButton,
+.colorItem {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  min-height: 32px;
+  padding: 0 10px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionButton {
+  background: var(--bg-elev-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.secondaryButton:hover,
+.colorItem:hover,
+.actionButton:hover {
+  border-color: var(--accent);
+}
+
+.measureLineHorizontal,
+.measureLineVertical,
+.measureTooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.measureLineHorizontal {
+  width: 100%;
+  border-bottom: 1px solid #ffffff;
+  mix-blend-mode: difference;
+}
+
+.measureLineVertical {
+  height: 100%;
+  border-left: 1px solid #ffffff;
+  mix-blend-mode: difference;
+}
+
+.measureTooltip {
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.72rem;
+}
+
+.colorsPanel {
+  display: grid;
+  gap: 8px;
+}
+
+.colorList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.colorList li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.colorItem {
+  width: 100%;
+  justify-content: flex-start;
+  position: relative;
+  padding-left: 32px;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
+.colorItem::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  width: 13px;
+  height: 13px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.34);
+  background: var(--swatch-color, #ffffff);
+}
+
+.spacesPanel {
+  grid-column: 1 / -1;
+}
+
+.spacesStatus {
+  margin: 6px 0;
+  color: var(--text-muted);
+}
+
+.spacesTableWrap {
+  overflow-x: auto;
+}
+
+.spacesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.spacesTable th,
+.spacesTable td {
+  text-align: left;
+  padding: 7px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.spacesTable th {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.spacesTable code {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1220px) {
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .previewPair {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 820px) {
+  .targetRow {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 4px;
+  }
+
+  .targetInlineInput,
+  .targetInlineSelect,
+  .targetSelectInline {
+    height: 30px;
+    min-width: 0;
+  }
+
+  .targetInlineInput {
+    flex: 1 1 130px;
+  }
+
+  .targetInlineSelect {
+    flex: 1 1 auto;
+  }
+
+  .targetSelectInline {
+    flex: 1 1 220px;
+  }
+  .backendInline {
+    white-space: normal;
+  }
+
+  .backendInline {
+    margin-left: 0;
+    gap: 4px;
+  }
+  .appHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .headerTools {
+    order: 3;
+    width: 100%;
+  }
+
+  .headerTools ul {
+    justify-content: flex-start;
+  }
+
+  .content {
+    padding: 6px;
+  }
+
+  .previewCompareControls {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .panelHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .colorList li {
+    flex-wrap: wrap;
+  }
+}
+
+/* Compact right-side chips */
+.compactHeader {
+  margin-bottom: 6px;
+}
+
+.inlineHeaderMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inlineHeaderMain h2 {
+  margin: 0;
+}
+
+.colorRow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.colorRow li {
+  display: block;
+}
+
+.colorPill {
+  position: relative;
+  min-height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  padding: 0 14px 0 34px;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.colorPill::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--swatch-color, #ffffff);
+}
+
+.colorPill:hover {
+  border-color: var(--accent);
+}
+
+.spacesPanel {
+  grid-column: auto;
+}
+
+.spacesCompactList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.spacesCompactList li {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.spaceChip,
+.spaceChipSecondary {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  color: var(--text);
+  min-height: 30px;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.spaceChip {
+  flex: 1;
+  text-align: left;
+  padding: 0 12px;
+}
+
+.spaceChipSecondary {
+  min-width: 60px;
+  padding: 0 10px;
+}
+
+.spaceChip:hover,
+.spaceChipSecondary:hover {
+  border-color: var(--accent);
+}
+
+/* Custom target URL should use full free width */
+.targetRowCustom .targetCustomInput {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .targetRowCustom .targetCustomInput {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+
+/* Spaces + Unicode composite panel */
+.spacesUnicodeLayout {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.spacesColumn,
+.unicodeColumn {
+  min-width: 0;
+}
+
+.spacesCompactList {
+  gap: 4px;
+}
+
+.spacesCompactList li {
+  gap: 4px;
+}
+
+.spaceChip,
+.spaceChipSecondary {
+  min-height: 26px;
+  font-size: 0.76rem;
+  border-radius: 6px;
+}
+
+.spaceChip {
+  padding: 0 8px;
+}
+
+.spaceChipSecondary {
+  min-width: 50px;
+  padding: 0 8px;
+}
+
+.unicodeColumn {
+  display: grid;
+  gap: 6px;
+}
+
+.unicodeTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.unicodeTab {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-height: 24px;
+  padding: 0 8px;
+  background: var(--bg-elev-2);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.unicodeTab:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.unicodeTab.active {
+  background: color-mix(in srgb, var(--accent) 25%, var(--bg-elev-2));
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.unicodeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 4px;
+  max-height: 340px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.unicodeCharButton {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  color: #cdd4e2;
+  min-height: 40px;
+  font: inherit;
+  font-size: 1.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.unicodeCharButton:hover {
+  border-color: var(--accent);
+  color: #f0f6ff;
+}
+
+@media (max-width: 820px) {
+  .spacesUnicodeLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .unicodeGrid {
+    max-height: 280px;
+  }
+}
+
+/* Requested layout fixes: no horizontal unicode scrollbar, fill available height, single-line spaces */
+.previewColumn {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: stretch;
+}
+
+.spacesPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.spacesUnicodeLayout {
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.spacesColumn {
+  min-height: 0;
+}
+
+.spacesCompactList li {
+  flex-wrap: nowrap;
+}
+
+.spaceChip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unicodeColumn {
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.unicodeGrid {
+  grid-template-columns: repeat(auto-fill, minmax(42px, 42px));
+  justify-content: start;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.unicodeCharButton {
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 820px) {
+  .previewColumn {
+    grid-template-rows: auto auto auto;
+  }
+
+  .spacesPanel {
+    grid-template-rows: auto auto;
+  }
+
+  .spacesUnicodeLayout {
+    height: auto;
+  }
+
+  .unicodeColumn {
+    grid-template-rows: auto auto;
+  }
+
+  .unicodeGrid {
+    height: auto;
+    min-height: 0;
+    max-height: 280px;
+  }
+}
+
+/* Layout tuning: unicode panel under editor and fixed square glyph tiles */
+.previewColumn {
+  grid-template-rows: auto auto;
+  align-content: start;
+}
+
+.spacesUnderEditor {
+  min-width: 0;
+}
+
+.spacesUnderEditor .spacesPanel {
+  height: 100%;
+}
+
+.unicodeGrid {
+  grid-template-columns: repeat(auto-fill, 42px);
+  justify-content: start;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.unicodeCharButton {
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spaceChip {
+  white-space: nowrap;
+}
+
+@media (max-width: 1220px) {
+  .spacesUnderEditor {
+    order: 3;
+  }
+}
+
+@media (max-width: 820px) {
+  .previewColumn {
+    grid-template-rows: auto auto;
+  }
+
+  .unicodeGrid {
+    max-height: 320px;
+  }
+}
+
+/* Final layout pass per latest request */
+.workspaceGrid {
+  align-items: start;
+}
+
+.editorPanel {
+  align-self: start;
+  min-height: 0;
+}
+
+.editorWrap {
+  flex: 0 0 auto;
+  min-height: 280px;
+  height: clamp(300px, 44vh, 430px);
+  max-height: 430px;
+}
+
+.spacesUnderEditor {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.spacesUnderEditor .spacesPanel {
+  height: auto;
+}
+
+.spacesUnicodeLayout {
+  grid-template-columns: 170px minmax(0, 1fr);
+}
+
+.unicodeGrid {
+  grid-template-columns: repeat(auto-fill, 42px);
+  justify-content: start;
+  min-height: 0;
+  height: auto;
+  max-height: 620px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.unicodeCharButton {
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+}
+
+.spaceChip {
+  white-space: nowrap;
+}
+
+@media (max-width: 1220px) {
+  .editorWrap {
+    height: clamp(280px, 42vh, 400px);
+    max-height: 400px;
+  }
+
+  .spacesUnderEditor {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 820px) {
+  .editorWrap {
+    height: clamp(260px, 38vh, 360px);
+    max-height: 360px;
+  }
+
+  .spacesUnicodeLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .unicodeGrid {
+    max-height: 320px;
+  }
+}
+
+/* Final pass: equal top row, split cards below, top-aligned unicode grid */
+.workspaceGrid {
+  align-items: stretch;
+}
+
+.workspaceGrid > .editorPanel,
+.workspaceGrid > .previewColumn {
+  height: 100%;
+  min-height: 0;
+}
+
+.editorPanel {
+  align-self: stretch;
+  min-height: 0;
+}
+
+.editorWrap {
+  flex: 1 1 auto;
+  min-height: 260px;
+  height: auto;
+  max-height: none;
+}
+
+.previewColumn {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.spacesUnderEditor {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.spacesCards {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.spacesCard,
+.unicodeCard {
+  min-width: 0;
+}
+
+.spacesCard .spacesCompactList li {
+  flex-wrap: nowrap;
+}
+
+.spacesCard .spaceChip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.unicodeCard .unicodeColumn {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+  min-height: 0;
+}
+
+.unicodeCard .unicodeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 42px);
+  grid-auto-rows: 42px;
+  justify-content: start;
+  align-content: start;
+  gap: 4px;
+  min-height: 0;
+  max-height: 620px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.unicodeCard .unicodeCharButton {
+  width: 42px;
+  min-width: 42px;
+  max-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1220px) {
+  .spacesCards {
+    grid-template-columns: 1fr;
+  }
+
+  .unicodeCard .unicodeGrid {
+    max-height: 420px;
+  }
+}
+
+@media (max-width: 820px) {
+  .editorWrap {
+    min-height: 240px;
+  }
+
+  .unicodeCard .unicodeGrid {
+    max-height: 320px;
+  }
+}
+
+/* Viewport-locked desktop layout: only unicode grid scrolls */
+@media (min-width: 821px) {
+  html,
+  body,
+  #root,
+  .appRoot {
+    height: 100%;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  .appRoot {
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .workspaceGrid {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .workspaceGrid > .editorPanel {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-self: stretch;
+  }
+
+  .workspaceGrid > .previewColumn {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 0;
+    align-self: stretch;
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: start;
+  }
+
+  .editorWrap {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    flex: 0 0 auto;
+  }
+
+  .spacesUnderEditor {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .spacesCards {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .spacesCard,
+  .unicodeCard {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .spacesCard .spacesCompactList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    align-content: start;
+  }
+
+  .spacesCard .spacesCompactList li {
+    min-width: 0;
+    gap: 4px;
+    flex-wrap: nowrap;
+  }
+
+  .spacesCard .spaceChip,
+  .spacesCard .spaceChipSecondary {
+    min-height: 24px;
+    font-size: 0.72rem;
+  }
+
+  .spacesCard .spaceChip {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 6px;
+  }
+
+  .spacesCard .spaceChipSecondary {
+    min-width: 42px;
+    padding: 0 6px;
+  }
+
+  .unicodeCard .unicodeColumn {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .unicodeCard .unicodeGrid {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
+    justify-content: start;
+    grid-template-columns: repeat(auto-fill, 42px);
+    grid-auto-rows: 42px;
+  }
+
+  .unicodeCard .unicodeCharButton {
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+  }
+}
+
+/* Stability patch: toolbar growth, no overlap, wider spaces, unicode-only scroll */
+@media (min-width: 821px) {
+  .content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .content > .workspaceGrid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .workspaceGrid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(280px, 1fr);
+    align-items: stretch;
+  }
+
+  .workspaceGrid > .previewColumn {
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+    align-self: stretch;
+  }
+
+  .workspaceGrid > .editorPanel {
+    min-height: 0;
+    height: auto;
+    align-self: stretch;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .editorWrap {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    flex: 0 0 auto;
+  }
+
+  .spacesUnderEditor {
+    grid-column: 1 / -1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .spacesCards {
+    height: 100%;
+    min-height: 0;
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .spacesCard,
+  .unicodeCard {
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .spacesCard .spacesCompactList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    align-content: start;
+  }
+
+  .spacesCard .spacesCompactList li {
+    min-width: 0;
+    flex-wrap: nowrap;
+  }
+
+  .spacesCard .spaceChip {
+    min-height: 24px;
+    font-size: 0.73rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .spacesCard .spaceChipSecondary {
+    min-height: 24px;
+    min-width: 44px;
+    font-size: 0.72rem;
+  }
+
+  .unicodeCard .unicodeColumn {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .unicodeCard .unicodeGrid {
+    min-height: 0;
+    height: 100%;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
+    justify-content: start;
+    grid-template-columns: repeat(auto-fill, 42px);
+    grid-auto-rows: 42px;
+  }
+}
+
+
+/* Editor scrollbar visibility fix */
+.editorWrap {
+  min-height: 0;
+}
+
+.editorWrap .cm-editor {
+  height: 100% !important;
+}
+
+.editorWrap .cm-scroller {
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+  scrollbar-gutter: stable;
+}
+
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .editorWrap {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+}
+
+/* Editor scroll functional fix: constrained flex scroll container */
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    align-self: stretch;
+  }
+
+  .workspaceGrid > .previewColumn {
+    align-self: stretch;
+  }
+
+  .editorWrap {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+  }
+
+  .editorWrap .cm-editor {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .editorWrap .cm-scroller {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Hard override: enforce finite editor height so CodeMirror can scroll */
+@media (min-width: 821px) {
+  .workspaceGrid {
+    grid-template-rows: minmax(0, 1fr) minmax(280px, 1fr) !important;
+  }
+
+  .workspaceGrid > .editorPanel {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-editor {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller {
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable;
+  }
+}
+
+/* Force visible scrollbar styling for CodeMirror */
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller {
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: auto !important;
+    -ms-overflow-style: auto !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-track {
+    background: #101826;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb {
+    background: #3a4f70;
+    border-radius: 8px;
+    border: 2px solid #101826;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb:hover {
+    background: #55709b;
+  }
+}
+
+/* Hard visual scrollbar override for CodeMirror (Firefox + WebKit) */
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #5c769f #0f1725 !important;
+    scrollbar-gutter: stable both-edges !important;
+    -ms-overflow-style: scrollbar !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar {
+    width: 12px !important;
+    height: 12px !important;
+    -webkit-appearance: none;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-track {
+    background: #0f1725 !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb {
+    background-color: #5c769f !important;
+    border-radius: 8px !important;
+    border: 2px solid #0f1725 !important;
+    min-height: 30px;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb:hover {
+    background-color: #7f9fcc !important;
+  }
+}
+
+/* Fallback: use editorWrap as the visible scroll host */
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel .editorWrap {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable both-edges !important;
+    scrollbar-width: auto !important;
+    scrollbar-color: #5c769f #0f1725 !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-editor {
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-track {
+    background: #0f1725 !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-thumb {
+    background-color: #5c769f !important;
+    border-radius: 8px !important;
+    border: 2px solid #0f1725 !important;
+    min-height: 30px;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-thumb:hover {
+    background-color: #7f9fcc !important;
+  }
+}
+
+/* Editor color system for dark/light */
+:root {
+  --editor-panel-bg: #070b13;
+  --editor-bg: #070b13;
+  --editor-text: #d8e2f2;
+  --editor-caret: #f1f7ff;
+  --editor-selection: #263047;
+  --editor-active-line: #1a2030;
+  --editor-gutter-bg: #0d131d;
+  --editor-gutter-border: #182234;
+  --editor-gutter-text: #5f7392;
+  --editor-active-gutter-bg: #1a2030;
+  --editor-active-gutter-text: #b2c2da;
+  --editor-syntax-comment: #6f6f91;
+  --editor-syntax-property: #9187e8;
+  --editor-syntax-number: #f4c26f;
+  --editor-syntax-string: #8bc3b2;
+  --editor-syntax-keyword: #d9e5f8;
+  --editor-syntax-tag: #e6edf9;
+  --editor-syntax-punctuation: #d0dbef;
+}
+
+[data-theme="light"] {
+  --editor-panel-bg: #f4f8ff;
+  --editor-bg: #fbfdff;
+  --editor-text: #1f2f44;
+  --editor-caret: #1f2f44;
+  --editor-selection: #d6e5ff;
+  --editor-active-line: #edf3ff;
+  --editor-gutter-bg: #edf3fc;
+  --editor-gutter-border: #d4dfee;
+  --editor-gutter-text: #6e82a1;
+  --editor-active-gutter-bg: #dfe9fb;
+  --editor-active-gutter-text: #2f4565;
+  --editor-syntax-comment: #7f8a9d;
+  --editor-syntax-property: #5f6cd8;
+  --editor-syntax-number: #a96c1d;
+  --editor-syntax-string: #2f7f6d;
+  --editor-syntax-keyword: #234067;
+  --editor-syntax-tag: #1d3658;
+  --editor-syntax-punctuation: #4a6286;
+}
+
+.editorPanel {
+  background: var(--editor-panel-bg);
+}
+
+.editorWrap {
+  background: var(--editor-bg);
+}
+
+.editorWrap .cm-editor {
+  background: var(--editor-bg);
+  color: var(--editor-text);
+}
+
+.editorWrap .cm-gutters {
+  background: var(--editor-gutter-bg);
+  border-right-color: var(--editor-gutter-border);
+  color: var(--editor-gutter-text);
+}
+
+.editorWrap .cm-content {
+  caret-color: var(--editor-caret);
+}
+
+.editorWrap .cm-cursor,
+.editorWrap .cm-dropCursor {
+  border-left-color: var(--editor-caret) !important;
+}
+
+/* Theme-aware editor scrollbar colors */
+:root {
+  --editor-scroll-track: #0f1725;
+  --editor-scroll-thumb: #5c769f;
+  --editor-scroll-thumb-hover: #7f9fcc;
+  --editor-scroll-border: #0f1725;
+}
+
+[data-theme="light"] {
+  --editor-scroll-track: #e7edf6;
+  --editor-scroll-thumb: #a8b8cf;
+  --editor-scroll-thumb-hover: #8fa4c2;
+  --editor-scroll-border: #e7edf6;
+}
+
+@media (min-width: 821px) {
+  .workspaceGrid > .editorPanel .editorWrap,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller {
+    scrollbar-color: var(--editor-scroll-thumb) var(--editor-scroll-track) !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-track,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-track {
+    background: var(--editor-scroll-track) !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-thumb,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb {
+    background-color: var(--editor-scroll-thumb) !important;
+    border: 2px solid var(--editor-scroll-border) !important;
+    border-radius: 8px !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-thumb:hover,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-thumb:hover {
+    background-color: var(--editor-scroll-thumb-hover) !important;
+  }
+
+  .workspaceGrid > .editorPanel .editorWrap::-webkit-scrollbar-button,
+  .workspaceGrid > .editorPanel .editorWrap .cm-scroller::-webkit-scrollbar-button {
+    background: var(--editor-scroll-track) !important;
+    height: 12px;
+  }
+}

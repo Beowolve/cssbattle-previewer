@@ -1,0 +1,270 @@
+﻿import { useEffect, useMemo, useState } from "react";
+import { renderApiBase } from "../supabase/client";
+import { Header } from "./components/Header";
+import { EditorPane } from "../editor/components/EditorPane";
+import { PreviewPane } from "../preview/components/PreviewPane";
+import { SpacesTable } from "../spaces/components/SpacesTable";
+import { TOOL_LINKS } from "../tools/config/toolLinks";
+import { TargetPicker } from "../targets/components/TargetPicker";
+import { useTargets } from "../targets/hooks/useTargets";
+import type { TargetItem, TargetMode, TargetSortOrder } from "../targets/types";
+import { encodeInvisibleChars, decodeHtmlEntities } from "../shared/utils/encoding";
+import { readStoredJson, readStoredString, writeStoredJson, writeStoredValue } from "../shared/utils/storage";
+import { useTheme } from "../theme/useTheme";
+import { ColorPalette } from "../colors/components/ColorPalette";
+
+interface SelectionState {
+  battle: string;
+  daily: string;
+  custom: string;
+}
+
+interface BackendOption {
+  id: string;
+  label: string;
+  apiBase: string;
+}
+
+const MODE_STORAGE_KEY = "cssbattle-previewer.mode";
+const SORT_STORAGE_KEY = "cssbattle-previewer.sort";
+const SELECTION_STORAGE_KEY = "cssbattle-previewer.selection";
+const BACKEND_STORAGE_KEY = "cssbattle-previewer.backend";
+const COMPARE_STORAGE_KEY = "cssbattle-previewer.preview.compare";
+const DIFF_STORAGE_KEY = "cssbattle-previewer.preview.diff";
+const CUSTOM_IMAGE_STORAGE_KEY = "cssbattle-previewer.custom-image";
+
+const BACKEND_OPTIONS: BackendOption[] = [
+  {
+    id: "chrome145",
+    label: "Chrome 145",
+    apiBase: renderApiBase
+  }
+];
+
+function isMode(value: string): value is TargetMode {
+  return value === "battle" || value === "daily" || value === "custom";
+}
+
+function isSortOrder(value: string): value is TargetSortOrder {
+  return value === "newest" || value === "oldest";
+}
+
+function compareTargets(aSortValue: number, bSortValue: number, sortOrder: TargetSortOrder): number {
+  const delta = aSortValue - bSortValue;
+  return sortOrder === "newest" ? -delta : delta;
+}
+
+function resolveBackendId(value: string): string {
+  return BACKEND_OPTIONS.some((option) => option.id === value) ? value : BACKEND_OPTIONS[0].id;
+}
+
+function buildCustomTarget(customImageUrl: string): TargetItem | null {
+  const normalized = customImageUrl.trim();
+  if (!normalized) {
+    return null;
+  }
+
+  return {
+    challengeId: "-1",
+    name: "Custom",
+    mode: "custom",
+    imageUrl: normalized,
+    colors: [],
+    label: "Custom",
+    sortValue: 0,
+    playUrl: null,
+    leaderboardUrl: null,
+    battleNumber: null,
+    date: null
+  };
+}
+
+export default function App() {
+  const [themeMode, setThemeMode] = useTheme();
+  const [mode, setMode] = useState<TargetMode>(() => {
+    const rawValue = readStoredString(MODE_STORAGE_KEY, "battle");
+    return isMode(rawValue) ? rawValue : "battle";
+  });
+  const [sortOrder, setSortOrder] = useState<TargetSortOrder>(() => {
+    const rawValue = readStoredString(SORT_STORAGE_KEY, "newest");
+    return isSortOrder(rawValue) ? rawValue : "newest";
+  });
+  const [backendId, setBackendId] = useState<string>(() =>
+    resolveBackendId(readStoredString(BACKEND_STORAGE_KEY, BACKEND_OPTIONS[0].id))
+  );
+  const [searchValue, setSearchValue] = useState("");
+  const [selection, setSelection] = useState<SelectionState>(() =>
+    readStoredJson<SelectionState>(SELECTION_STORAGE_KEY, {
+      battle: "",
+      daily: "",
+      custom: ""
+    })
+  );
+  const [customImageUrl, setCustomImageUrl] = useState<string>(() => readStoredString(CUSTOM_IMAGE_STORAGE_KEY, ""));
+  const [code, setCode] = useState("");
+  const [debouncedCode, setDebouncedCode] = useState("");
+  const [isCompareEnabled, setIsCompareEnabled] = useState<boolean>(() =>
+    readStoredString(COMPARE_STORAGE_KEY, "1") === "1"
+  );
+  const [isDiffEnabled, setIsDiffEnabled] = useState<boolean>(() => readStoredString(DIFF_STORAGE_KEY, "0") === "1");
+
+  const targetsQuery = useTargets(mode);
+
+  const sortedTargets = useMemo(() => {
+    return [...targetsQuery.targets].sort((a, b) => compareTargets(a.sortValue, b.sortValue, sortOrder));
+  }, [targetsQuery.targets, sortOrder]);
+
+  const selectedTarget = useMemo(() => {
+    if (mode === "custom") {
+      return buildCustomTarget(customImageUrl);
+    }
+
+    const selectedId = selection[mode];
+    if (selectedId) {
+      const found = sortedTargets.find((target) => target.challengeId === selectedId);
+      if (found) {
+        return found;
+      }
+    }
+
+    return sortedTargets[0] ?? null;
+  }, [customImageUrl, mode, selection, sortedTargets]);
+
+  const selectedBackend = useMemo(() => {
+    return BACKEND_OPTIONS.find((option) => option.id === backendId) ?? BACKEND_OPTIONS[0];
+  }, [backendId]);
+
+  const renderTargetId = useMemo(() => {
+    if (mode === "custom") {
+      return "-1";
+    }
+
+    return selectedTarget?.challengeId ?? "-1";
+  }, [mode, selectedTarget]);
+
+  useEffect(() => {
+    if (mode === "custom" || !selectedTarget) {
+      return;
+    }
+
+    if (selection[mode] === selectedTarget.challengeId) {
+      return;
+    }
+
+    setSelection((previousState) => ({
+      ...previousState,
+      [mode]: selectedTarget.challengeId
+    }));
+  }, [mode, selectedTarget, selection]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedCode(code);
+    }, 650);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [code]);
+
+  useEffect(() => {
+    writeStoredValue(MODE_STORAGE_KEY, mode);
+  }, [mode]);
+
+  useEffect(() => {
+    writeStoredValue(SORT_STORAGE_KEY, sortOrder);
+  }, [sortOrder]);
+
+  useEffect(() => {
+    writeStoredValue(BACKEND_STORAGE_KEY, backendId);
+  }, [backendId]);
+
+  useEffect(() => {
+    writeStoredValue(CUSTOM_IMAGE_STORAGE_KEY, customImageUrl);
+  }, [customImageUrl]);
+
+  useEffect(() => {
+    writeStoredValue(COMPARE_STORAGE_KEY, isCompareEnabled ? "1" : "0");
+  }, [isCompareEnabled]);
+
+  useEffect(() => {
+    writeStoredValue(DIFF_STORAGE_KEY, isDiffEnabled ? "1" : "0");
+  }, [isDiffEnabled]);
+
+  useEffect(() => {
+    writeStoredJson(SELECTION_STORAGE_KEY, selection);
+  }, [selection]);
+
+  const decodedCharCount = useMemo(() => decodeHtmlEntities(code).length, [code]);
+  const showTargetErrors = mode !== "custom";
+
+  return (
+    <div className="appRoot">
+      <Header themeMode={themeMode} onThemeModeChange={setThemeMode} links={TOOL_LINKS} />
+
+      <main className="content">
+        <TargetPicker
+          mode={mode}
+          onModeChange={setMode}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
+          searchValue={searchValue}
+          onSearchValueChange={setSearchValue}
+          selectedTargetId={selectedTarget?.challengeId ?? selection[mode] ?? ""}
+          onTargetIdChange={(nextTargetId) =>
+            setSelection((previousState) => ({
+              ...previousState,
+              [mode]: nextTargetId
+            }))
+          }
+          targets={sortedTargets}
+          backendOptions={BACKEND_OPTIONS.map((option) => ({ id: option.id, label: option.label }))}
+          backendId={backendId}
+          onBackendIdChange={(nextBackendId) => setBackendId(resolveBackendId(nextBackendId))}
+          customImageUrl={customImageUrl}
+          onCustomImageUrlChange={setCustomImageUrl}
+        />
+
+        {showTargetErrors && !targetsQuery.hasConfig ? (
+          <div className="statusCard errorCard">
+            Missing Supabase config. Create <code>.env</code> from <code>.env.example</code> and set
+            <code> VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>.
+          </div>
+        ) : null}
+
+        {showTargetErrors && targetsQuery.error ? (
+          <div className="statusCard errorCard">{(targetsQuery.error as Error).message || "Target query failed."}</div>
+        ) : null}
+
+        <section className="workspaceGrid">
+          <EditorPane
+            code={code}
+            charCount={decodedCharCount}
+            onCodeChange={setCode}
+            onDecodeEntities={() => setCode((previousCode) => decodeHtmlEntities(previousCode))}
+            onEncodeInvisible={() => setCode((previousCode) => encodeInvisibleChars(previousCode))}
+          />
+
+          <aside className="previewColumn">
+            <PreviewPane
+              target={selectedTarget}
+              debouncedCode={debouncedCode}
+              renderApiBase={selectedBackend.apiBase}
+              renderTargetId={renderTargetId}
+              isCompareEnabled={isCompareEnabled}
+              isDiffEnabled={isDiffEnabled}
+              onCompareEnabledChange={setIsCompareEnabled}
+              onDiffEnabledChange={setIsDiffEnabled}
+            />
+
+            <ColorPalette colors={selectedTarget?.colors ?? []} />
+          </aside>
+
+          <div className="spacesUnderEditor">
+            <SpacesTable />
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+
