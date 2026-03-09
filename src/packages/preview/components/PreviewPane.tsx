@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState, useRef } from "react";
 import type { MouseEvent } from "react";
 import type { TargetItem } from "../../targets/types";
 
@@ -44,6 +44,8 @@ export function PreviewPane({
   const [isShiftPressed, setIsShiftPressed] = useState(false);
   const [cursorX, setCursorX] = useState(-1000);
   const [cursorY, setCursorY] = useState(-1000);
+  const referenceWrapRef = useRef<HTMLDivElement | null>(null);
+  const [referenceOffset, setReferenceOffset] = useState({ left: 0, top: 0 });
 
   useEffect(() => {
     setCompareX(HIDDEN_COMPARE_OFFSET);
@@ -121,6 +123,24 @@ export function PreviewPane({
     setCursorX(-1000);
     setCursorY(-1000);
   };
+
+  useEffect(() => {
+    if (referenceWrapRef.current) {
+      const bounds = referenceWrapRef.current.getBoundingClientRect();
+      setReferenceOffset({ left: bounds.left, top: bounds.top });
+    }
+    // Aktualisiere Offset bei Fenstergröße-Änderung
+    const handleResize = () => {
+      if (referenceWrapRef.current) {
+        const bounds = referenceWrapRef.current.getBoundingClientRect();
+        setReferenceOffset({ left: bounds.left, top: bounds.top });
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   if (!target) {
     return (
@@ -226,12 +246,24 @@ export function PreviewPane({
 
         <section className="previewBlock">
           <h3 className="previewBlockTitle">Target</h3>
-          <div className="referenceWrap" onMouseMove={handleMeasureMove} onMouseLeave={handleMeasureLeave}>
+          <div
+            className="measureTooltip"
+            style={{
+              left: `${cursorX + referenceOffset.left + 8}px`,
+              top: `${cursorY + referenceOffset.top - 28}px`,
+              position: "fixed"
+            }}
+          >
+            {cursorX} / {cursorY}
+          </div>
+          <div
+            className="referenceWrap"
+            ref={referenceWrapRef}
+            onMouseMove={handleMeasureMove}
+            onMouseLeave={handleMeasureLeave}
+          >
             <div className="measureLineHorizontal" style={{ top: `${cursorY}px` }} />
             <div className="measureLineVertical" style={{ left: `${cursorX}px` }} />
-            <div className="measureTooltip" style={{ left: `${cursorX + 8}px`, top: `${cursorY - 28}px` }}>
-              {cursorX} / {cursorY}
-            </div>
 
             <img
               className="referenceImage"
