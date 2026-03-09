@@ -1,5 +1,4 @@
 ﻿import { useEffect, useMemo } from "react";
-import type { ChangeEvent } from "react";
 import type { TargetItem, TargetMode, TargetSortOrder } from "../types";
 
 interface BackendOption {
@@ -81,7 +80,7 @@ export function TargetPicker({
     onTargetIdChange(filteredTargets[0].challengeId);
   }, [mode, filteredTargets, selectedTargetId, onTargetIdChange]);
 
-  const handleModeChange = (event: ChangeEvent<HTMLButtonElement>) => {
+  const handleModeChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const value = event.currentTarget.value;
 
     if (value === "daily") {
@@ -204,4 +203,3 @@ export function TargetPicker({
     </section>
   );
 }
-
