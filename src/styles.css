@@ -1203,19 +1203,6 @@ a {
   overflow-x: hidden;
 }
 
-.unicodeCard .unicodeCharButton {
-  width: 42px;
-  min-width: 42px;
-  max-width: 42px;
-  height: 42px;
-  min-height: 42px;
-  max-height: 42px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @media (max-width: 1220px) {
   .spacesCards {
     grid-template-columns: 1fr;
