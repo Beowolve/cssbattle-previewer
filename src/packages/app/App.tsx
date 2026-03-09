@@ -1,4 +1,5 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { renderApiBase } from "../supabase/client";
 import { Header } from "./components/Header";
 import { EditorPane } from "../editor/components/EditorPane";
@@ -6,6 +7,7 @@ import { PreviewPane } from "../preview/components/PreviewPane";
 import { SpacesTable } from "../spaces/components/SpacesTable";
 import { TOOL_LINKS } from "../tools/config/toolLinks";
 import { TargetPicker } from "../targets/components/TargetPicker";
+import { clearTargetCaches } from "../targets/cache";
 import { useTargets } from "../targets/hooks/useTargets";
 import type { TargetItem, TargetMode, TargetSortOrder } from "../targets/types";
 import { encodeInvisibleChars, decodeHtmlEntities } from "../shared/utils/encoding";
@@ -109,6 +111,7 @@ export default function App() {
   const [isDiffEnabled, setIsDiffEnabled] = useState<boolean>(() => readStoredString(DIFF_STORAGE_KEY, "0") === "1");
 
   const targetsQuery = useTargets(mode);
+  const queryClient = useQueryClient();
 
   const sortedTargets = useMemo(() => {
     return [...targetsQuery.targets].sort((a, b) => compareTargets(a.sortValue, b.sortValue, sortOrder));
@@ -141,6 +144,23 @@ export default function App() {
 
     return selectedTarget?.challengeId ?? "-1";
   }, [mode, selectedTarget]);
+
+  useEffect(() => {
+    function handleForceRefresh(event: KeyboardEvent) {
+      const isForceRefreshShortcut = event.key === "F5" && (event.ctrlKey || event.metaKey);
+      if (!isForceRefreshShortcut) {
+        return;
+      }
+
+      event.preventDefault();
+      clearTargetCaches();
+      queryClient.removeQueries({ queryKey: ["targets"] });
+      void queryClient.refetchQueries({ queryKey: ["targets"], type: "active" });
+    }
+
+    window.addEventListener("keydown", handleForceRefresh);
+    return () => window.removeEventListener("keydown", handleForceRefresh);
+  }, [queryClient]);
 
   useEffect(() => {
     if (mode === "custom" || !selectedTarget) {
