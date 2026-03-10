@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import type { MouseEvent, PointerEvent } from "react";
+import type { PointerEvent } from "react";
 import type { TargetItem } from "../../targets/types";
 
 const TARGET_WIDTH = 400;
 const TARGET_HEIGHT = 300;
 const HIDDEN_COMPARE_OFFSET = -1;
 const FIXED_RENDER_TARGET_ID = "-1";
+const TOUCH_AXIS_LOCK_THRESHOLD = 8;
+type CompareOrientation = "horizontal" | "vertical";
+
+interface ActiveTouchCompareGesture {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  lockedOrientation: CompareOrientation | null;
+}
 
 interface PreviewPaneProps {
   target: TargetItem | null;
@@ -41,14 +50,19 @@ export function PreviewPane({
   const [compareX, setCompareX] = useState(HIDDEN_COMPARE_OFFSET);
   const [compareY, setCompareY] = useState(HIDDEN_COMPARE_OFFSET);
   const [isShiftPressed, setIsShiftPressed] = useState(false);
+  const [touchCompareOrientation, setTouchCompareOrientation] = useState<CompareOrientation | null>(null);
   const [cursorX, setCursorX] = useState(-1000);
   const [cursorY, setCursorY] = useState(-1000);
   const referenceWrapRef = useRef<HTMLDivElement | null>(null);
+  const activeTouchCompareGestureRef = useRef<ActiveTouchCompareGesture | null>(null);
+  const activeMeasurePointerIdRef = useRef<number | null>(null);
   const [referenceOffset, setReferenceOffset] = useState({ left: 0, top: 0 });
 
   useEffect(() => {
     setCompareX(HIDDEN_COMPARE_OFFSET);
     setCompareY(HIDDEN_COMPARE_OFFSET);
+    setTouchCompareOrientation(null);
+    activeTouchCompareGestureRef.current = null;
   }, [isCompareEnabled, isDiffEnabled, target?.challengeId]);
 
   useEffect(() => {
@@ -99,6 +113,30 @@ export function PreviewPane({
     setCompareY(HIDDEN_COMPARE_OFFSET);
   };
 
+  const updateMeasureCursor = (event: PointerEvent<HTMLDivElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const nextX = clampOffset(Math.floor(event.clientX - bounds.left), TARGET_WIDTH - 1);
+    const nextY = clampOffset(Math.floor(event.clientY - bounds.top), TARGET_HEIGHT - 1);
+    setCursorX(nextX);
+    setCursorY(nextY);
+  };
+
+  const detectTouchCompareOrientation = (
+    gesture: ActiveTouchCompareGesture,
+    pointerX: number,
+    pointerY: number
+  ): CompareOrientation | null => {
+    const deltaX = Math.abs(pointerX - gesture.startX);
+    const deltaY = Math.abs(pointerY - gesture.startY);
+    const movement = Math.max(deltaX, deltaY);
+
+    if (movement < TOUCH_AXIS_LOCK_THRESHOLD) {
+      return null;
+    }
+
+    return deltaY > deltaX ? "horizontal" : "vertical";
+  };
+
   const updateComparePosition = (event: PointerEvent<HTMLDivElement>) => {
     if (!isCompareEnabled) {
       return;
@@ -109,10 +147,41 @@ export function PreviewPane({
     const nextY = clampOffset(event.clientY - bounds.top, TARGET_HEIGHT);
     setCompareX(nextX);
     setCompareY(nextY);
+
+    if (event.pointerType === "touch") {
+      const activeGesture = activeTouchCompareGestureRef.current;
+      if (activeGesture && activeGesture.pointerId === event.pointerId) {
+        const nextOrientation =
+          activeGesture.lockedOrientation ?? detectTouchCompareOrientation(activeGesture, nextX, nextY);
+
+        if (nextOrientation && activeGesture.lockedOrientation !== nextOrientation) {
+          activeGesture.lockedOrientation = nextOrientation;
+          setTouchCompareOrientation(nextOrientation);
+        }
+      }
+      return;
+    }
+
+    setTouchCompareOrientation(null);
     setIsShiftPressed(event.shiftKey);
   };
 
   const handlePreviewPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") {
+      const bounds = event.currentTarget.getBoundingClientRect();
+      activeTouchCompareGestureRef.current = {
+        pointerId: event.pointerId,
+        startX: clampOffset(event.clientX - bounds.left, TARGET_WIDTH),
+        startY: clampOffset(event.clientY - bounds.top, TARGET_HEIGHT),
+        lockedOrientation: null
+      };
+      setTouchCompareOrientation(null);
+      setIsShiftPressed(false);
+    } else {
+      activeTouchCompareGestureRef.current = null;
+      setTouchCompareOrientation(null);
+    }
+
     updateComparePosition(event);
 
     if (event.currentTarget.setPointerCapture) {
@@ -134,21 +203,62 @@ export function PreviewPane({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+
+    const activeGesture = activeTouchCompareGestureRef.current;
+    if (event.pointerType === "touch" && activeGesture && activeGesture.pointerId === event.pointerId) {
+      activeTouchCompareGestureRef.current = null;
+      setTouchCompareOrientation(null);
+      resetComparePosition();
+    }
   };
 
   const handlePreviewPointerCancel = () => {
+    activeTouchCompareGestureRef.current = null;
+    setTouchCompareOrientation(null);
     resetComparePosition();
-  };
-
-  const handleMeasureMove = (event: MouseEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    setCursorX(Math.floor(event.clientX - bounds.left));
-    setCursorY(Math.floor(event.clientY - bounds.top));
   };
 
   const handleMeasureLeave = () => {
     setCursorX(-1000);
     setCursorY(-1000);
+  };
+
+  const handleMeasurePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    updateMeasureCursor(event);
+    activeMeasurePointerIdRef.current = event.pointerId;
+
+    if (event.currentTarget.setPointerCapture) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+  };
+
+  const handleMeasurePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    updateMeasureCursor(event);
+  };
+
+  const handleMeasurePointerLeave = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") {
+      handleMeasureLeave();
+    }
+  };
+
+  const handleMeasurePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    const isActivePointer = activeMeasurePointerIdRef.current === event.pointerId;
+    if (isActivePointer) {
+      activeMeasurePointerIdRef.current = null;
+      if (event.pointerType !== "mouse") {
+        handleMeasureLeave();
+      }
+    }
+  };
+
+  const handleMeasurePointerCancel = () => {
+    activeMeasurePointerIdRef.current = null;
+    handleMeasureLeave();
   };
 
   useEffect(() => {
@@ -180,7 +290,7 @@ export function PreviewPane({
   const isCompareVisible = isCompareEnabled && compareX >= 0 && compareY >= 0;
   const shouldRenderFullDiff = isDiffEnabled && !isCompareVisible;
   const overlayBlendMode = isDiffEnabled ? "difference" : "normal";
-  const useHorizontalCompare = isShiftPressed;
+  const useHorizontalCompare = isShiftPressed || touchCompareOrientation === "horizontal";
 
   const canRenderHorizontal = isCompareVisible && compareY < TARGET_HEIGHT;
   const canRenderVertical = isCompareVisible && compareX < TARGET_WIDTH;
@@ -314,8 +424,12 @@ export function PreviewPane({
           <div
             className="referenceWrap"
             ref={referenceWrapRef}
-            onMouseMove={handleMeasureMove}
-            onMouseLeave={handleMeasureLeave}
+            style={{ touchAction: "none" }}
+            onPointerDown={handleMeasurePointerDown}
+            onPointerMove={handleMeasurePointerMove}
+            onPointerLeave={handleMeasurePointerLeave}
+            onPointerUp={handleMeasurePointerUp}
+            onPointerCancel={handleMeasurePointerCancel}
           >
             <div className="measureLineHorizontal" style={{ top: `${cursorY}px` }} />
             <div className="measureLineVertical" style={{ left: `${cursorX}px` }} />
