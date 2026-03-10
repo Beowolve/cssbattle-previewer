@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [3.0.5] - 2026-03-10
+
+### Fixed
+
+- Added touch controls for the target measure crosshair so it can be moved with finger drag.
+- Added touch gesture axis detection for Slide & Compare to switch between vertical and horizontal compare directions.
+- Reset Slide & Compare overlay when touch ends to match the non-hover desktop state.
+- Compacted git-cliff release note output by removing blank lines between list items.
+
 ## [3.0.4] - 2026-03-10
 
 ### Fixed
