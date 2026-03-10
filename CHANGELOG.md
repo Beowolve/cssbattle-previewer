@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [3.0.2] - 2026-03-10
+
+### Added
+
+- Added deep-link support for target selection via URL query parameters across battle, daily, and custom modes.
+- Added a "Copy Link" toolbar button to copy the current deep-link URL for sharing.
+
+### Fixed
+
+- Fixed release notes generation to include all commits between the previous release tag and the current tag.
+- Fixed release workflow validation by removing invalid secret checks from workflow expressions and handling optional Discord webhook posting in script logic.
 ## [3.0.1] - 2026-03-10
 
 ### Added
