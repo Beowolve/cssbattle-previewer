@@ -692,13 +692,10 @@ a {
   }
   .appHeader {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "brand theme"
-      "tools tools";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "brand tools theme";
     align-items: center;
-    column-gap: 8px;
-    row-gap: 6px;
+    column-gap: 6px;
     padding: 6px 8px;
   }
 
@@ -735,17 +732,28 @@ a {
 
   .headerTools {
     grid-area: tools;
-    width: 100%;
+    min-width: 0;
   }
 
   .headerTools ul {
-    justify-content: flex-start;
-    gap: 6px;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .headerTools ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .headerTools li {
+    flex: 0 0 auto;
   }
 
   .headerTools a {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     border-radius: 6px;
     justify-content: center;
@@ -763,7 +771,16 @@ a {
   }
 
   .content {
-    padding: 6px;
+    padding: 0;
+  }
+
+  .panel {
+      border-radius: 0;
+      border-inline: none;
+  }
+
+  .toolbarPanel {
+      margin-top: 8px;
   }
 
   .previewCompareControls {
