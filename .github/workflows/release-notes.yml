@@ -1,0 +1,68 @@
+name: Release Notes
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes with git-cliff
+        id: git_cliff
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          make_latest: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+      - name: Post release notes to Discord
+        if: ${{ success() && secrets.DISCORD_RELEASE_WEBHOOK_URL != '' }}
+        env:
+          DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+
+          notes_file = Path('RELEASE_NOTES.md')
+          notes = notes_file.read_text(encoding='utf-8').strip() if notes_file.exists() else 'No release notes generated.'
+
+          prefix = f"New release **{os.environ['RELEASE_TAG']}**\n{os.environ['RELEASE_URL']}\n\n"
+          max_len = 1900
+          allowed = max(max_len - len(prefix), 0)
+          excerpt = notes[:allowed]
+          if len(notes) > allowed:
+              excerpt = excerpt.rstrip() + '...'
+
+          payload = {"content": prefix + excerpt}
+          request = Request(
+              os.environ['DISCORD_RELEASE_WEBHOOK_URL'],
+              data=json.dumps(payload).encode('utf-8'),
+              headers={'Content-Type': 'application/json'}
+          )
+
+          with urlopen(request) as response:
+              print(f"Discord webhook status: {response.status}")
+          PY
