@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [3.0.3] - 2026-03-10
+
+### Fixed
+
+- Prevented output image rerenders when switching targets; output generation now only reacts to editor code changes.
+- Updated Discord release notification workflow to use `curl` and `jq` with embed payload handling.
 ## [3.0.2] - 2026-03-10
 
 ### Added
