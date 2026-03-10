@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 import type { TargetItem } from "../../targets/types";
 
 const TARGET_WIDTH = 400;
@@ -94,7 +94,12 @@ export function PreviewPane({
     setIsLoading(true);
   }, [previewUrl, hasTarget]);
 
-  const handlePreviewMouseMove = (event: MouseEvent<HTMLDivElement>) => {
+  const resetComparePosition = () => {
+    setCompareX(HIDDEN_COMPARE_OFFSET);
+    setCompareY(HIDDEN_COMPARE_OFFSET);
+  };
+
+  const updateComparePosition = (event: PointerEvent<HTMLDivElement>) => {
     if (!isCompareEnabled) {
       return;
     }
@@ -107,9 +112,32 @@ export function PreviewPane({
     setIsShiftPressed(event.shiftKey);
   };
 
-  const handlePreviewMouseLeave = () => {
-    setCompareX(HIDDEN_COMPARE_OFFSET);
-    setCompareY(HIDDEN_COMPARE_OFFSET);
+  const handlePreviewPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    updateComparePosition(event);
+
+    if (event.currentTarget.setPointerCapture) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+  };
+
+  const handlePreviewPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    updateComparePosition(event);
+  };
+
+  const handlePreviewPointerLeave = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse" || event.pointerType === "pen") {
+      resetComparePosition();
+    }
+  };
+
+  const handlePreviewPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  const handlePreviewPointerCancel = () => {
+    resetComparePosition();
   };
 
   const handleMeasureMove = (event: MouseEvent<HTMLDivElement>) => {
@@ -188,7 +216,15 @@ export function PreviewPane({
             </div>
           </div>
 
-          <div className="previewCanvas" onMouseMove={handlePreviewMouseMove} onMouseLeave={handlePreviewMouseLeave}>
+          <div
+            className="previewCanvas"
+            style={{ touchAction: isCompareEnabled ? "none" : "auto" }}
+            onPointerDown={handlePreviewPointerDown}
+            onPointerMove={handlePreviewPointerMove}
+            onPointerLeave={handlePreviewPointerLeave}
+            onPointerUp={handlePreviewPointerUp}
+            onPointerCancel={handlePreviewPointerCancel}
+          >
             {isLoading ? <div className="previewLoader" /> : null}
 
             <img
