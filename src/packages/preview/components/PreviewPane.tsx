@@ -1,25 +1,25 @@
-﻿import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import type { MouseEvent } from "react";
 import type { TargetItem } from "../../targets/types";
 
 const TARGET_WIDTH = 400;
 const TARGET_HEIGHT = 300;
 const HIDDEN_COMPARE_OFFSET = -1;
+const FIXED_RENDER_TARGET_ID = "-1";
 
 interface PreviewPaneProps {
   target: TargetItem | null;
   debouncedCode: string;
   renderApiBase: string;
-  renderTargetId: string;
   isCompareEnabled: boolean;
   isDiffEnabled: boolean;
   onCompareEnabledChange: (nextValue: boolean) => void;
   onDiffEnabledChange: (nextValue: boolean) => void;
 }
 
-function buildPreviewUrl(apiBase: string, code: string, targetId: string): string {
+function buildPreviewUrl(apiBase: string, code: string): string {
   const params = new URLSearchParams();
-  params.set("t", targetId);
+  params.set("t", FIXED_RENDER_TARGET_ID);
   params.set("q", code);
   return `${apiBase}?${params.toString()}`;
 }
@@ -32,7 +32,6 @@ export function PreviewPane({
   target,
   debouncedCode,
   renderApiBase,
-  renderTargetId,
   isCompareEnabled,
   isDiffEnabled,
   onCompareEnabledChange,
@@ -81,8 +80,8 @@ export function PreviewPane({
   }, []);
 
   const previewUrl = useMemo(() => {
-    return buildPreviewUrl(renderApiBase, debouncedCode, renderTargetId);
-  }, [renderApiBase, debouncedCode, renderTargetId]);
+    return buildPreviewUrl(renderApiBase, debouncedCode);
+  }, [renderApiBase, debouncedCode]);
 
   const hasTarget = target !== null;
 

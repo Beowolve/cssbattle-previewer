@@ -219,14 +219,6 @@ export default function App() {
     return BACKEND_OPTIONS.find((option) => option.id === backendId) ?? BACKEND_OPTIONS[0];
   }, [backendId]);
 
-  const renderTargetId = useMemo(() => {
-    if (mode === "custom") {
-      return "-1";
-    }
-
-    return selectedTarget?.challengeId ?? "-1";
-  }, [mode, selectedTarget]);
-
   const shareQuery = useMemo(
     () => buildShareQuery(mode, selection, selectedTarget?.challengeId ?? null, customImageUrl),
     [customImageUrl, mode, selectedTarget?.challengeId, selection]
@@ -369,7 +361,6 @@ export default function App() {
               target={selectedTarget}
               debouncedCode={debouncedCode}
               renderApiBase={selectedBackend.apiBase}
-              renderTargetId={renderTargetId}
               isCompareEnabled={isCompareEnabled}
               isDiffEnabled={isDiffEnabled}
               onCompareEnabledChange={setIsCompareEnabled}
