@@ -77,6 +77,17 @@ a {
   flex-shrink: 0;
 }
 
+.brandMeta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.brandText {
+  white-space: nowrap;
+}
+
 .brandLogo {
   width: 24px;
   height: 24px;
@@ -146,6 +157,7 @@ a {
   font-size: 0.82rem;
   color: var(--text-muted);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .themeSwitch > select,
@@ -679,18 +691,75 @@ a {
     gap: 4px;
   }
   .appHeader {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand theme"
+      "tools tools";
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 6px;
+    padding: 6px 8px;
+  }
+
+  .brand {
+    grid-area: brand;
+    min-width: 0;
+  }
+
+  .brandMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+  }
+
+  .brandText {
+    font-size: 0.95rem;
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brandVersion {
+    font-size: 0.68rem;
+    line-height: 1;
+  }
+
+  .themeSwitch {
+    grid-area: theme;
+    justify-self: end;
+    margin-left: 0;
   }
 
   .headerTools {
-    order: 3;
+    grid-area: tools;
     width: 100%;
   }
 
   .headerTools ul {
     justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .headerTools a {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 6px;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .toolIcon,
+  .toolIconImage {
+    width: 16px;
+    height: 16px;
+  }
+
+  .toolLabel {
+    display: none;
   }
 
   .content {

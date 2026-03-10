@@ -1,4 +1,4 @@
-﻿import type { ToolLink } from "../config/toolLinks";
+import type { ToolLink } from "../config/toolLinks";
 
 interface ToolNavProps {
   links: ToolLink[];
@@ -14,7 +14,7 @@ export function ToolNav({ links }: ToolNavProps) {
               <span className="toolIcon" aria-hidden="true">
                 <img className="toolIconImage" src={link.iconPath} alt="" loading="lazy" decoding="async" />
               </span>
-              <span>{link.label}</span>
+              <span className="toolLabel">{link.label}</span>
             </a>
           </li>
         ))}

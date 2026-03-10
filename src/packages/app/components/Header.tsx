@@ -15,9 +15,11 @@ export function Header({ themeMode, onThemeModeChange, links }: HeaderProps) {
       <header className="appHeader">
         <div className="brand">
           <img className="brandLogo" src={`${import.meta.env.BASE_URL}cssbattle_previewer.png`} alt="" aria-hidden="true" />
-          <span className="brandText">CSSBattle Previewer</span>
-          <span className="brandVersion" aria-label={`Version ${__APP_VERSION__}`}>
-            v{__APP_VERSION__}
+          <span className="brandMeta">
+            <span className="brandText">CSSBattle Previewer</span>
+            <span className="brandVersion" aria-label={`Version ${__APP_VERSION__}`}>
+              v{__APP_VERSION__}
+            </span>
           </span>
         </div>
 
