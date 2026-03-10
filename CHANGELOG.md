@@ -2,7 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on Keep a Changelog and this project follows Semantic Versioning.
+The format is based on Keep a Changelog, and this project follows Semantic Versioning.
+
+## [3.0.1] - 2026-03-10
+
+### Added
+
+- Added a GitHub Actions release workflow that uses git-cliff to publish GitHub Release Notes on tag push without uploading build artifacts.
+
+### Fixed
+
+- Kept the full diff overlay visible when Diff is enabled and no hover compare is active.
+- Preserved the existing hover and Shift split-compare behavior while the cursor is inside the preview.
+- Removed the 1px overlay shift by replacing border-based divider lines with pseudo-elements.
+- Restored divider visibility with explicit stacking order for overlay image and divider line.
 
 ## [3.0.0] - 2026-03-08
 
