@@ -11,6 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,40 +52,49 @@ jobs:
           make_latest: true
           prerelease: ${{ contains(github.ref_name, '-') }}
 
-      - name: Post release notes to Discord
-        env:
-          DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
-          RELEASE_TAG: ${{ github.ref_name }}
-          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+      - name: Notify Discord about release notes
+        if: ${{ env.DISCORD_RELEASE_WEBHOOK_URL != '' }}
+        shell: bash
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          from urllib.request import Request, urlopen
+          release_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${GITHUB_REF_NAME}"
+          notes=""
 
-          webhook_url = os.getenv('DISCORD_RELEASE_WEBHOOK_URL', '').strip()
-          if not webhook_url:
-              print('No DISCORD_RELEASE_WEBHOOK_URL configured; skipping Discord notification.')
-              raise SystemExit(0)
+          if [ -f RELEASE_NOTES.md ]; then
+            notes="$(cat RELEASE_NOTES.md)"
+          fi
 
-          notes_file = Path('RELEASE_NOTES.md')
-          notes = notes_file.read_text(encoding='utf-8').strip() if notes_file.exists() else 'No release notes generated.'
+          if [ -z "${notes}" ]; then
+            notes="No release notes were generated for this release."
+          fi
 
-          prefix = f"New release **{os.environ['RELEASE_TAG']}**\n{os.environ['RELEASE_URL']}\n\n"
-          max_len = 1900
-          allowed = max(max_len - len(prefix), 0)
-          excerpt = notes[:allowed]
-          if len(notes) > allowed:
-              excerpt = excerpt.rstrip() + '...'
+          max_length=3800
+          if [ ${#notes} -gt ${max_length} ]; then
+            notes="${notes:0:${max_length}}\n\n[... truncated, read full notes in GitHub release.]"
+          fi
 
-          payload = {'content': prefix + excerpt}
-          request = Request(
-              webhook_url,
-              data=json.dumps(payload).encode('utf-8'),
-              headers={'Content-Type': 'application/json'}
-          )
+          payload="$(jq -n \
+            --arg username "CSSBattle Previewer Releases" \
+            --arg title "CSSBattle Previewer ${GITHUB_REF_NAME}" \
+            --arg url "${release_url}" \
+            --arg description "${notes}" \
+            '{
+              username: $username,
+              embeds: [
+                {
+                  title: $title,
+                  url: $url,
+                  description: $description,
+                  color: 3447003
+                }
+              ]
+            }')"
 
-          with urlopen(request) as response:
-              print(f'Discord webhook status: {response.status}')
-          PY
+          curl --fail-with-body \
+            --header "Content-Type: application/json" \
+            --request POST \
+            --data "${payload}" \
+            "${DISCORD_RELEASE_WEBHOOK_URL}"
+
+      - name: Warn if Discord webhook is missing
+        if: ${{ env.DISCORD_RELEASE_WEBHOOK_URL == '' }}
+        run: echo "::warning::DISCORD_RELEASE_WEBHOOK_URL is not configured. Skipping Discord release notification."
