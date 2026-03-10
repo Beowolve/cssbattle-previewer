@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { TargetItem, TargetMode, TargetSortOrder } from "../types";
 
 interface BackendOption {
@@ -21,6 +21,7 @@ interface TargetPickerProps {
   onBackendIdChange: (nextBackendId: string) => void;
   customImageUrl: string;
   onCustomImageUrlChange: (nextValue: string) => void;
+  shareUrl: string;
 }
 
 function compareTargets(a: TargetItem, b: TargetItem, sortOrder: TargetSortOrder): number {
@@ -49,8 +50,11 @@ export function TargetPicker({
   backendId,
   onBackendIdChange,
   customImageUrl,
-  onCustomImageUrlChange
+  onCustomImageUrlChange,
+  shareUrl
 }: TargetPickerProps) {
+  const [shareCopyState, setShareCopyState] = useState<"idle" | "copied" | "error">("idle");
+
   const filteredTargets = useMemo(() => {
     const normalizedQuery = searchValue.trim().toLowerCase();
 
@@ -80,6 +84,18 @@ export function TargetPicker({
     onTargetIdChange(filteredTargets[0].challengeId);
   }, [mode, filteredTargets, selectedTargetId, onTargetIdChange]);
 
+  useEffect(() => {
+    if (shareCopyState === "idle") {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShareCopyState("idle");
+    }, 1600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [shareCopyState]);
+
   const handleModeChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const value = event.currentTarget.value;
 
@@ -94,6 +110,29 @@ export function TargetPicker({
     }
 
     onModeChange("battle");
+  };
+
+  const handleCopyShareLink = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        // Fallback for environments where clipboard API is not available.
+        const helper = document.createElement("textarea");
+        helper.value = shareUrl;
+        helper.setAttribute("readonly", "");
+        helper.style.position = "absolute";
+        helper.style.left = "-9999px";
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand("copy");
+        document.body.removeChild(helper);
+      }
+
+      setShareCopyState("copied");
+    } catch {
+      setShareCopyState("error");
+    }
   };
 
   return (
@@ -180,7 +219,6 @@ export function TargetPicker({
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
             </select>
-
           </>
         )}
 
@@ -199,6 +237,10 @@ export function TargetPicker({
             ))}
           </select>
         </label>
+
+        <button type="button" className="secondaryButton targetShareButton" onClick={handleCopyShareLink}>
+          {shareCopyState === "copied" ? "Copied" : shareCopyState === "error" ? "Copy failed" : "Copy Link"}
+        </button>
       </div>
     </section>
   );

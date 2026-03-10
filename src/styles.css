@@ -276,6 +276,11 @@ a {
 .backendInline .targetInlineSelect {
   min-width: 0;
 }
+
+.targetShareButton {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .statusCard {
   margin-top: 6px;
   border: 1px solid var(--border);

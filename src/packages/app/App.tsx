@@ -27,6 +27,12 @@ interface BackendOption {
   apiBase: string;
 }
 
+interface ParsedQueryState {
+  mode?: TargetMode;
+  targetId?: string;
+  imageUrl?: string;
+}
+
 const MODE_STORAGE_KEY = "cssbattle-previewer.mode";
 const SORT_STORAGE_KEY = "cssbattle-previewer.sort";
 const SELECTION_STORAGE_KEY = "cssbattle-previewer.selection";
@@ -34,6 +40,12 @@ const BACKEND_STORAGE_KEY = "cssbattle-previewer.backend";
 const COMPARE_STORAGE_KEY = "cssbattle-previewer.preview.compare";
 const DIFF_STORAGE_KEY = "cssbattle-previewer.preview.diff";
 const CUSTOM_IMAGE_STORAGE_KEY = "cssbattle-previewer.custom-image";
+
+const DEFAULT_SELECTION_STATE: SelectionState = {
+  battle: "",
+  daily: "",
+  custom: ""
+};
 
 const BACKEND_OPTIONS: BackendOption[] = [
   {
@@ -49,6 +61,73 @@ function isMode(value: string): value is TargetMode {
 
 function isSortOrder(value: string): value is TargetSortOrder {
   return value === "newest" || value === "oldest";
+}
+
+function parseInitialQueryState(search: string): ParsedQueryState {
+  const params = new URLSearchParams(search);
+  const rawMode = (params.get("mode") ?? "").trim().toLowerCase();
+  const rawTargetId = (params.get("target") ?? "").trim();
+  const rawImageUrl = (params.get("image") ?? "").trim();
+
+  const parsedState: ParsedQueryState = {};
+
+  if (isMode(rawMode)) {
+    parsedState.mode = rawMode;
+  }
+
+  // If an image URL is provided without mode, default to custom mode.
+  if (!parsedState.mode && rawImageUrl) {
+    parsedState.mode = "custom";
+  }
+
+  if (rawTargetId) {
+    parsedState.targetId = rawTargetId;
+  }
+
+  if (rawImageUrl) {
+    parsedState.imageUrl = rawImageUrl;
+  }
+
+  return parsedState;
+}
+
+function buildInitialSelectionState(parsedQueryState: ParsedQueryState): SelectionState {
+  const storedSelection = readStoredJson<SelectionState>(SELECTION_STORAGE_KEY, DEFAULT_SELECTION_STATE);
+
+  if ((parsedQueryState.mode === "battle" || parsedQueryState.mode === "daily") && parsedQueryState.targetId) {
+    return {
+      ...storedSelection,
+      [parsedQueryState.mode]: parsedQueryState.targetId
+    };
+  }
+
+  return storedSelection;
+}
+
+function buildShareQuery(
+  mode: TargetMode,
+  selection: SelectionState,
+  selectedTargetId: string | null,
+  customImageUrl: string
+): string {
+  const params = new URLSearchParams();
+  params.set("mode", mode);
+
+  if (mode === "custom") {
+    const normalizedImageUrl = customImageUrl.trim();
+    if (normalizedImageUrl) {
+      params.set("image", normalizedImageUrl);
+    }
+
+    return params.toString();
+  }
+
+  const targetId = selection[mode] || selectedTargetId || "";
+  if (targetId) {
+    params.set("target", targetId);
+  }
+
+  return params.toString();
 }
 
 function compareTargets(aSortValue: number, bSortValue: number, sortOrder: TargetSortOrder): number {
@@ -83,9 +162,12 @@ function buildCustomTarget(customImageUrl: string): TargetItem | null {
 
 export default function App() {
   const [themeMode, setThemeMode] = useTheme();
+  const initialQueryState = useMemo(() => parseInitialQueryState(window.location.search), []);
+
   const [mode, setMode] = useState<TargetMode>(() => {
     const rawValue = readStoredString(MODE_STORAGE_KEY, "battle");
-    return isMode(rawValue) ? rawValue : "battle";
+    const storedMode = isMode(rawValue) ? rawValue : "battle";
+    return initialQueryState.mode ?? storedMode;
   });
   const [sortOrder, setSortOrder] = useState<TargetSortOrder>(() => {
     const rawValue = readStoredString(SORT_STORAGE_KEY, "newest");
@@ -95,14 +177,14 @@ export default function App() {
     resolveBackendId(readStoredString(BACKEND_STORAGE_KEY, BACKEND_OPTIONS[0].id))
   );
   const [searchValue, setSearchValue] = useState("");
-  const [selection, setSelection] = useState<SelectionState>(() =>
-    readStoredJson<SelectionState>(SELECTION_STORAGE_KEY, {
-      battle: "",
-      daily: "",
-      custom: ""
-    })
-  );
-  const [customImageUrl, setCustomImageUrl] = useState<string>(() => readStoredString(CUSTOM_IMAGE_STORAGE_KEY, ""));
+  const [selection, setSelection] = useState<SelectionState>(() => buildInitialSelectionState(initialQueryState));
+  const [customImageUrl, setCustomImageUrl] = useState<string>(() => {
+    if (initialQueryState.mode === "custom") {
+      return initialQueryState.imageUrl ?? "";
+    }
+
+    return readStoredString(CUSTOM_IMAGE_STORAGE_KEY, "");
+  });
   const [code, setCode] = useState("");
   const [debouncedCode, setDebouncedCode] = useState("");
   const [isCompareEnabled, setIsCompareEnabled] = useState<boolean>(() =>
@@ -145,6 +227,15 @@ export default function App() {
     return selectedTarget?.challengeId ?? "-1";
   }, [mode, selectedTarget]);
 
+  const shareQuery = useMemo(
+    () => buildShareQuery(mode, selection, selectedTarget?.challengeId ?? null, customImageUrl),
+    [customImageUrl, mode, selectedTarget?.challengeId, selection]
+  );
+  const shareSearch = shareQuery ? `?${shareQuery}` : "";
+  const shareUrl = useMemo(() => {
+    return `${window.location.origin}${window.location.pathname}${shareSearch}${window.location.hash}`;
+  }, [shareSearch]);
+
   useEffect(() => {
     function handleForceRefresh(event: KeyboardEvent) {
       const isForceRefreshShortcut = event.key === "F5" && (event.ctrlKey || event.metaKey);
@@ -176,6 +267,15 @@ export default function App() {
       [mode]: selectedTarget.challengeId
     }));
   }, [mode, selectedTarget, selection]);
+
+  useEffect(() => {
+    if (window.location.search === shareSearch) {
+      return;
+    }
+
+    const nextUrl = `${window.location.pathname}${shareSearch}${window.location.hash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [shareSearch]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -241,6 +341,7 @@ export default function App() {
           onBackendIdChange={(nextBackendId) => setBackendId(resolveBackendId(nextBackendId))}
           customImageUrl={customImageUrl}
           onCustomImageUrlChange={setCustomImageUrl}
+          shareUrl={shareUrl}
         />
 
         {showTargetErrors && !targetsQuery.hasConfig ? (
@@ -286,5 +387,3 @@ export default function App() {
     </div>
   );
 }
-
-
