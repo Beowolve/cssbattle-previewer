@@ -450,12 +450,38 @@ a {
   pointer-events: none;
 }
 
+.previewTarget {
+  z-index: 1;
+}
+
 .previewTargetOverlayVertical {
-  border-left: 1px solid #ff3b4e;
+  position: absolute;
 }
 
 .previewTargetOverlayHorizontal {
-  border-top: 1px solid #ff3b4e;
+  position: absolute;
+}
+
+.previewTargetOverlayVertical::before,
+.previewTargetOverlayHorizontal::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  background: #ff3b4e;
+}
+
+.previewTargetOverlayVertical::before {
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+
+.previewTargetOverlayHorizontal::before {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 1px;
 }
 
 .buttonRow {

@@ -129,7 +129,7 @@ export function PreviewPane({
       const bounds = referenceWrapRef.current.getBoundingClientRect();
       setReferenceOffset({ left: bounds.left, top: bounds.top });
     }
-    // Aktualisiere Offset bei Fenstergröße-Änderung
+    // Keep tooltip offset aligned when the viewport size changes.
     const handleResize = () => {
       if (referenceWrapRef.current) {
         const bounds = referenceWrapRef.current.getBoundingClientRect();
@@ -151,6 +151,8 @@ export function PreviewPane({
   }
 
   const isCompareVisible = isCompareEnabled && compareX >= 0 && compareY >= 0;
+  const shouldRenderFullDiff = isDiffEnabled && !isCompareVisible;
+  const overlayBlendMode = isDiffEnabled ? "difference" : "normal";
   const useHorizontalCompare = isShiftPressed;
 
   const canRenderHorizontal = isCompareVisible && compareY < TARGET_HEIGHT;
@@ -199,6 +201,24 @@ export function PreviewPane({
               onLoad={() => setIsLoading(false)}
               onError={() => setIsLoading(false)}
             />
+            {shouldRenderFullDiff ? (
+              <div
+                className="previewTargetOverlay"
+                style={{
+                  width: `${TARGET_WIDTH}px`,
+                  height: `${TARGET_HEIGHT}px`,
+                  mixBlendMode: overlayBlendMode
+                }}
+              >
+                <img
+                  className="previewTarget"
+                  src={target.imageUrl}
+                  width={TARGET_WIDTH}
+                  height={TARGET_HEIGHT}
+                  alt="Target overlay"
+                />
+              </div>
+            ) : null}
 
             {useHorizontalCompare && canRenderHorizontal ? (
               <div
@@ -207,7 +227,7 @@ export function PreviewPane({
                   top: `${compareY}px`,
                   width: `${TARGET_WIDTH}px`,
                   height: `${TARGET_HEIGHT - compareY}px`,
-                  mixBlendMode: isDiffEnabled ? "difference" : "normal"
+                  mixBlendMode: overlayBlendMode
                 }}
               >
                 <img
@@ -228,7 +248,7 @@ export function PreviewPane({
                   left: `${compareX}px`,
                   width: `${TARGET_WIDTH - compareX}px`,
                   height: `${TARGET_HEIGHT}px`,
-                  mixBlendMode: isDiffEnabled ? "difference" : "normal"
+                  mixBlendMode: overlayBlendMode
                 }}
               >
                 <img
