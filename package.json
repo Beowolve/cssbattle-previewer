@@ -1,7 +1,7 @@
 {
   "name": "cssbattle-previewer",
   "private": true,
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Modern CSSBattle previewer",
   "type": "module",
   "engines": {

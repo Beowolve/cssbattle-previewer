@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [3.0.4] - 2026-03-10
+
+### Fixed
+
+- Removed border radius from output and target previews to keep full target visibility.
+- Added a minimum mobile editor height to prevent the code editor from collapsing to a single line.
+- Improved touch interaction for slide/compare mode so the divider can be dragged smoothly on touch devices.
+- Kept tool links in the mobile header between brand and theme switch with compact icon-only layout.
+- Corrected Discord release webhook variable handling in CI.
+
 ## [3.0.3] - 2026-03-10
 
 ### Fixed
