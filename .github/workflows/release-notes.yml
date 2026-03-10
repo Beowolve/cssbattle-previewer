@@ -17,12 +17,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Determine tag range
+        id: tag_range
+        shell: bash
+        run: |
+          current_tag="${GITHUB_REF_NAME}"
+          previous_tag="$(git tag --list 'v*.*.*' --sort=-v:refname | grep -Fxv "${current_tag}" | head -n 1 || true)"
+
+          if [ -n "${previous_tag}" ]; then
+            range="${previous_tag}..${current_tag}"
+          else
+            range="${current_tag}"
+          fi
+
+          echo "previous_tag=${previous_tag}" >> "${GITHUB_OUTPUT}"
+          echo "range=${range}" >> "${GITHUB_OUTPUT}"
+          echo "Using range: ${range}"
+
       - name: Generate release notes with git-cliff
         id: git_cliff
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: --latest --strip header
+          args: "${{ steps.tag_range.outputs.range }} --strip header"
         env:
           OUTPUT: RELEASE_NOTES.md
 
@@ -34,7 +51,6 @@ jobs:
           prerelease: ${{ contains(github.ref_name, '-') }}
 
       - name: Post release notes to Discord
-        if: ${{ success() && secrets.DISCORD_RELEASE_WEBHOOK_URL != '' }}
         env:
           DISCORD_RELEASE_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK_URL }}
           RELEASE_TAG: ${{ github.ref_name }}
@@ -46,6 +62,11 @@ jobs:
           from pathlib import Path
           from urllib.request import Request, urlopen
 
+          webhook_url = os.getenv('DISCORD_RELEASE_WEBHOOK_URL', '').strip()
+          if not webhook_url:
+              print('No DISCORD_RELEASE_WEBHOOK_URL configured; skipping Discord notification.')
+              raise SystemExit(0)
+
           notes_file = Path('RELEASE_NOTES.md')
           notes = notes_file.read_text(encoding='utf-8').strip() if notes_file.exists() else 'No release notes generated.'
 
@@ -56,13 +77,13 @@ jobs:
           if len(notes) > allowed:
               excerpt = excerpt.rstrip() + '...'
 
-          payload = {"content": prefix + excerpt}
+          payload = {'content': prefix + excerpt}
           request = Request(
-              os.environ['DISCORD_RELEASE_WEBHOOK_URL'],
+              webhook_url,
               data=json.dumps(payload).encode('utf-8'),
               headers={'Content-Type': 'application/json'}
           )
 
           with urlopen(request) as response:
-              print(f"Discord webhook status: {response.status}")
+              print(f'Discord webhook status: {response.status}')
           PY
