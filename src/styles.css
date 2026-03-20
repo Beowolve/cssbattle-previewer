@@ -1500,7 +1500,7 @@ a {
 
   .workspaceGrid {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto minmax(280px, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     align-items: stretch;
   }
 
@@ -1657,7 +1657,8 @@ a {
 /* Hard override: enforce finite editor height so CodeMirror can scroll */
 @media (min-width: 821px) {
   .workspaceGrid {
-    grid-template-rows: minmax(0, 1fr) minmax(280px, 1fr) !important;
+    /* Keep the top row (including colors) visible first; let lower tools shrink on tight viewports. */
+    grid-template-rows: auto minmax(0, 1fr) !important;
   }
 
   .workspaceGrid > .editorPanel {
