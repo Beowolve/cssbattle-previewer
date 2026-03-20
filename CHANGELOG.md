@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [3.0.6] - 2026-03-20
+
+### Fixed
+
+- Restored visible text selection highlighting in the editor with explicit CodeMirror selection overrides and theme-aware selection colors.
+- Updated desktop workspace row sizing so the upper area stays visible and the lower tools area shrinks first on tight heights.
+- Added a dedicated desktop scrollbar to the Spaces list when vertical space is limited.
+
 ## [3.0.5] - 2026-03-10
 
 ### Fixed
