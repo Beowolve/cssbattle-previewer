@@ -1928,3 +1928,13 @@ a {
 .editorWrap .cm-line > span::selection {
   background-color: var(--editor-selection) !important;
 }
+
+/* Desktop: keep spaces section visible by scrolling its list when vertical space is limited. */
+@media (min-width: 821px) {
+  .spacesCard .spacesCompactList {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+  }
+}
