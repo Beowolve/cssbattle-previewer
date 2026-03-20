@@ -1797,7 +1797,7 @@ a {
   --editor-bg: #070b13;
   --editor-text: #d8e2f2;
   --editor-caret: #f1f7ff;
-  --editor-selection: #263047;
+  --editor-selection: #274168;
   --editor-active-line: #1a2030;
   --editor-gutter-bg: #0d131d;
   --editor-gutter-border: #182234;
@@ -1818,7 +1818,7 @@ a {
   --editor-bg: #fbfdff;
   --editor-text: #1f2f44;
   --editor-caret: #1f2f44;
-  --editor-selection: #d6e5ff;
+  --editor-selection: #b7d3ff;
   --editor-active-line: #edf3ff;
   --editor-gutter-bg: #edf3fc;
   --editor-gutter-border: #d4dfee;
@@ -1917,4 +1917,13 @@ a {
   .workspaceGrid > .editorPanel .editorWrap {
     min-height: 300px !important;
   }
+}
+
+/* Editor-only selection override to keep text selection visible across CodeMirror modes. */
+.editorWrap .cm-selectionBackground,
+.editorWrap .cm-focused .cm-selectionBackground,
+.editorWrap .cm-content ::selection,
+.editorWrap .cm-line::selection,
+.editorWrap .cm-line > span::selection {
+  background-color: var(--editor-selection) !important;
 }
