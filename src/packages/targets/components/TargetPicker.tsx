@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TargetItem, TargetMode, TargetSortOrder } from "../types";
 
-interface BackendOption {
-  id: string;
-  label: string;
-}
-
 interface TargetPickerProps {
   mode: TargetMode;
   onModeChange: (nextMode: TargetMode) => void;
@@ -16,9 +11,6 @@ interface TargetPickerProps {
   selectedTargetId: string;
   onTargetIdChange: (nextTargetId: string) => void;
   targets: TargetItem[];
-  backendOptions: BackendOption[];
-  backendId: string;
-  onBackendIdChange: (nextBackendId: string) => void;
   customImageUrl: string;
   onCustomImageUrlChange: (nextValue: string) => void;
   shareUrl: string;
@@ -46,9 +38,6 @@ export function TargetPicker({
   selectedTargetId,
   onTargetIdChange,
   targets,
-  backendOptions,
-  backendId,
-  onBackendIdChange,
   customImageUrl,
   onCustomImageUrlChange,
   shareUrl
@@ -221,22 +210,6 @@ export function TargetPicker({
             </select>
           </>
         )}
-
-        <label className="backendInline" htmlFor="backendSelect">
-          Backend
-          <select
-            id="backendSelect"
-            className="targetInlineSelect"
-            value={backendId}
-            onChange={(event) => onBackendIdChange(event.target.value)}
-          >
-            {backendOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
 
         <button type="button" className="secondaryButton targetShareButton" onClick={handleCopyShareLink}>
           {shareCopyState === "copied" ? "Copied" : shareCopyState === "error" ? "Copy failed" : "Copy Link"}

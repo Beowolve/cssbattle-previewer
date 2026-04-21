@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+- Addd a link to the GitHub repository in the app header.
+- Render-API-Link updated to a new version. (Chrome 147)
+- Backend version combobox removed.
+
 ## [3.0.6] - 2026-03-20
 
 ### Fixed

@@ -21,12 +21,6 @@ interface SelectionState {
   custom: string;
 }
 
-interface BackendOption {
-  id: string;
-  label: string;
-  apiBase: string;
-}
-
 interface ParsedQueryState {
   mode?: TargetMode;
   targetId?: string;
@@ -36,7 +30,6 @@ interface ParsedQueryState {
 const MODE_STORAGE_KEY = "cssbattle-previewer.mode";
 const SORT_STORAGE_KEY = "cssbattle-previewer.sort";
 const SELECTION_STORAGE_KEY = "cssbattle-previewer.selection";
-const BACKEND_STORAGE_KEY = "cssbattle-previewer.backend";
 const COMPARE_STORAGE_KEY = "cssbattle-previewer.preview.compare";
 const DIFF_STORAGE_KEY = "cssbattle-previewer.preview.diff";
 const CUSTOM_IMAGE_STORAGE_KEY = "cssbattle-previewer.custom-image";
@@ -46,14 +39,6 @@ const DEFAULT_SELECTION_STATE: SelectionState = {
   daily: "",
   custom: ""
 };
-
-const BACKEND_OPTIONS: BackendOption[] = [
-  {
-    id: "chrome145",
-    label: "Chrome 145",
-    apiBase: renderApiBase
-  }
-];
 
 function isMode(value: string): value is TargetMode {
   return value === "battle" || value === "daily" || value === "custom";
@@ -135,10 +120,6 @@ function compareTargets(aSortValue: number, bSortValue: number, sortOrder: Targe
   return sortOrder === "newest" ? -delta : delta;
 }
 
-function resolveBackendId(value: string): string {
-  return BACKEND_OPTIONS.some((option) => option.id === value) ? value : BACKEND_OPTIONS[0].id;
-}
-
 function buildCustomTarget(customImageUrl: string): TargetItem | null {
   const normalized = customImageUrl.trim();
   if (!normalized) {
@@ -173,9 +154,6 @@ export default function App() {
     const rawValue = readStoredString(SORT_STORAGE_KEY, "newest");
     return isSortOrder(rawValue) ? rawValue : "newest";
   });
-  const [backendId, setBackendId] = useState<string>(() =>
-    resolveBackendId(readStoredString(BACKEND_STORAGE_KEY, BACKEND_OPTIONS[0].id))
-  );
   const [searchValue, setSearchValue] = useState("");
   const [selection, setSelection] = useState<SelectionState>(() => buildInitialSelectionState(initialQueryState));
   const [customImageUrl, setCustomImageUrl] = useState<string>(() => {
@@ -214,10 +192,6 @@ export default function App() {
 
     return sortedTargets[0] ?? null;
   }, [customImageUrl, mode, selection, sortedTargets]);
-
-  const selectedBackend = useMemo(() => {
-    return BACKEND_OPTIONS.find((option) => option.id === backendId) ?? BACKEND_OPTIONS[0];
-  }, [backendId]);
 
   const shareQuery = useMemo(
     () => buildShareQuery(mode, selection, selectedTarget?.challengeId ?? null, customImageUrl),
@@ -286,10 +260,6 @@ export default function App() {
   }, [sortOrder]);
 
   useEffect(() => {
-    writeStoredValue(BACKEND_STORAGE_KEY, backendId);
-  }, [backendId]);
-
-  useEffect(() => {
     writeStoredValue(CUSTOM_IMAGE_STORAGE_KEY, customImageUrl);
   }, [customImageUrl]);
 
@@ -328,9 +298,6 @@ export default function App() {
             }))
           }
           targets={sortedTargets}
-          backendOptions={BACKEND_OPTIONS.map((option) => ({ id: option.id, label: option.label }))}
-          backendId={backendId}
-          onBackendIdChange={(nextBackendId) => setBackendId(resolveBackendId(nextBackendId))}
           customImageUrl={customImageUrl}
           onCustomImageUrlChange={setCustomImageUrl}
           shareUrl={shareUrl}
@@ -360,7 +327,7 @@ export default function App() {
             <PreviewPane
               target={selectedTarget}
               debouncedCode={debouncedCode}
-              renderApiBase={selectedBackend.apiBase}
+              renderApiBase={renderApiBase}
               isCompareEnabled={isCompareEnabled}
               isDiffEnabled={isDiffEnabled}
               onCompareEnabledChange={setIsCompareEnabled}

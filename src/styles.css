@@ -150,6 +150,38 @@ a {
   display: block;
 }
 
+.headerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.githubRepositoryLink {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elev-2);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.githubRepositoryLink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.githubIcon {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+
 .themeSwitch {
   display: inline-flex;
   align-items: center;
@@ -157,7 +189,6 @@ a {
   font-size: 0.82rem;
   color: var(--text-muted);
   flex-shrink: 0;
-  margin-left: auto;
 }
 
 .themeSwitch > select,
@@ -182,7 +213,8 @@ a {
 .modeButton:focus-visible,
 .secondaryButton:focus-visible,
 .actionButton:focus-visible,
-.colorItem:focus-visible {
+.colorItem:focus-visible,
+.githubRepositoryLink:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
@@ -275,21 +307,8 @@ a {
 }
 
 
-.backendInline {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-
-.backendInline .targetInlineSelect {
-  min-width: 0;
-}
-
 .targetShareButton {
+  margin-left: auto;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -682,18 +701,14 @@ a {
   .targetSelectInline {
     flex: 1 1 220px;
   }
-  .backendInline {
-    white-space: normal;
+  .targetShareButton {
+    margin-left: 0;
   }
 
-  .backendInline {
-    margin-left: 0;
-    gap: 4px;
-  }
   .appHeader {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: "brand tools theme";
+    grid-template-areas: "brand tools actions";
     align-items: center;
     column-gap: 6px;
     padding: 6px 8px;
@@ -724,10 +739,21 @@ a {
     line-height: 1;
   }
 
-  .themeSwitch {
-    grid-area: theme;
+  .headerActions {
+    grid-area: actions;
     justify-self: end;
     margin-left: 0;
+    gap: 6px;
+  }
+
+  .githubRepositoryLink {
+    width: 28px;
+    height: 28px;
+  }
+
+  .githubIcon {
+    width: 16px;
+    height: 16px;
   }
 
   .headerTools {
