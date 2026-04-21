@@ -2,6 +2,8 @@
 
 Modern React + Vite + TypeScript application for previewing CSSBattle solutions against battle and daily targets.
 
+The backend for this project has its own repo: [cssbattle-previewer-backend](https://github.com/Beowolve/cssbattle-previewer-backend).
+
 ## What's New In v3.0
 
 - Major architecture refactor into domain-focused modules under `src/packages/*`
