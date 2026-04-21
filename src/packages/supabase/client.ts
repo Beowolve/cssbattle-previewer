@@ -24,4 +24,4 @@ export function getSupabaseClient(): SupabaseClient {
 }
 
 export const renderApiBase =
-  import.meta.env.VITE_RENDER_API_BASE ?? "https://chrome145-141759074277.europe-west3.run.app";
+  import.meta.env.VITE_RENDER_API_BASE ?? "https://cssbattle-previewer-backend-141759074277.europe-west3.run.app";
