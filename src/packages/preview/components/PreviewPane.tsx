@@ -5,7 +5,6 @@ import type { TargetItem } from "../../targets/types";
 const TARGET_WIDTH = 400;
 const TARGET_HEIGHT = 300;
 const HIDDEN_COMPARE_OFFSET = -1;
-const FIXED_RENDER_TARGET_ID = "-1";
 const TOUCH_AXIS_LOCK_THRESHOLD = 8;
 type CompareOrientation = "horizontal" | "vertical";
 
@@ -26,9 +25,9 @@ interface PreviewPaneProps {
   onDiffEnabledChange: (nextValue: boolean) => void;
 }
 
-function buildPreviewUrl(apiBase: string, code: string): string {
+function buildPreviewUrl(apiBase: string, code: string, targetId: string): string {
   const params = new URLSearchParams();
-  params.set("t", FIXED_RENDER_TARGET_ID);
+  params.set("t", targetId);
   params.set("q", code);
   return `${apiBase}?${params.toString()}`;
 }
@@ -93,9 +92,10 @@ export function PreviewPane({
     };
   }, []);
 
+  const targetId = target?.challengeId ?? "";
   const previewUrl = useMemo(() => {
-    return buildPreviewUrl(renderApiBase, debouncedCode);
-  }, [renderApiBase, debouncedCode]);
+    return targetId ? buildPreviewUrl(renderApiBase, debouncedCode, targetId) : "";
+  }, [renderApiBase, debouncedCode, targetId]);
 
   const hasTarget = target !== null;
 

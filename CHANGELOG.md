@@ -7,9 +7,17 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 ## [Unreleased]
 
 ### Added
+
 - Addd a link to the GitHub repository in the app header.
+
+### Changed
+
 - Render-API-Link updated to a new version. (Chrome 147)
 - Backend version combobox removed.
+
+### Fixed
+
+- Use the selected target id in preview render URLs instead of always sending the custom target id.
 
 ## [3.0.6] - 2026-03-20
 
